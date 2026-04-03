@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=70.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "marek-dgen"
+version = "0.0.3"
+description = "Automated AI/ML pipeline intended for English-to-Czech translation and dubbing of videos (e.g., YouTube video with a conversation, dialogue)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "AGPL-3.0" }
+authors = [
+  { name = "Ondrej Salamon", email = "ondrej.salamon@vsb.cz" }
+]
+
+dependencies = [
+    "click>=8.0.0",
+    "whisperx",
+    "pydub"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "flake8"
+]
+
+[project.scripts]
+dabuj = "marek_dgen.cli:main"

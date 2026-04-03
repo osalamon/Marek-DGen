@@ -208,4 +208,4 @@ __marimo__/
 
 # data files and intermediate outpus
 data/
-outputs/
+output/

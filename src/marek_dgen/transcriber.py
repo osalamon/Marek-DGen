@@ -4,7 +4,7 @@ import torch
 from whisperx.diarize import DiarizationPipeline
 
 def transcribe_and_diarize(audio_file: str, hf_token: str):
-	audio_file = "data/whisperx2mintest.mp4"
+	audio_file = audio_file.strip()
 	device = "cuda"				# or "cpu"
 	batch_size = 4 				# 16, reduce if low on GPU mem
 	compute_type = "int8" # "float16", change to "int8" if low on GPU mem (may reduce accuracy)

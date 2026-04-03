@@ -16,7 +16,8 @@ authors = [
 dependencies = [
     "click>=8.0.0",
     "whisperx",
-    "pydub"
+    "pydub",
+		"openai"
 ]
 
 [project.optional-dependencies]

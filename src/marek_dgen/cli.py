@@ -9,7 +9,9 @@ def main(audio_file, hf_token):
     DABUJ: Automated AI/ML pipeline for dubbing.
     Runs the WhisperX transcription and diarization pipeline.
     """
-    click.echo(f"Starting processing for: {audio_file}")
+    click.echo(f"=====================================================================")
+    click.echo(f">>> Processing of `{audio_file}` has started! <<<")
+    click.echo(f"=====================================================================")
 
     # Call the logic from your other file
     segments = transcribe_and_diarize(audio_file, hf_token)

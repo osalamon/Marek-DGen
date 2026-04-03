@@ -9,7 +9,7 @@ def transcribe_and_diarize(audio_file: str, hf_token: str):
 	batch_size = 4 				# 16, reduce if low on GPU mem
 	compute_type = "int8" # "float16", change to "int8" if low on GPU mem (may reduce accuracy)
 	spearkers_count = 2 	# set to None if unknown, or specify number of speakers
-	model_name = "large-v3" # Automatic Speech Recognition (ASR) model, e.g. "base", "large-v2"
+	model_name = "large-v2" # Automatic Speech Recognition (ASR) model, e.g. "base", "large-v2"
 
 	print(f">>>1a) Loading standard WhisperX model...")
 	# model_dir = "output/" # add download_root argument lo load model to a specific directory

@@ -6,8 +6,8 @@ from whisperx.diarize import DiarizationPipeline
 def transcribe_and_diarize(audio_file: str, hf_token: str):
 	device = "cuda"
 	audio_file = "data/whisperx2mintest.mp4"
-	batch_size = 8 # reduce if low on GPU mem
-	compute_type = "float16" # change to "int8" if low on GPU mem (may reduce accuracy)
+	batch_size = 4 # reduce if low on GPU mem
+	compute_type = "int8" # change to "int8" if low on GPU mem (may reduce accuracy)
 
 	# 1. Loading standard WhisperX model
 	model_dir = "output/"

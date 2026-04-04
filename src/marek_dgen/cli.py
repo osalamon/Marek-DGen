@@ -7,8 +7,8 @@ content_desc = "conversation in the episode nr. 311 of the Peter Attia's podcast
 @click.command()
 @click.argument('audio_file', type=click.Path(exists=True))
 @click.option('--hf-token', required=True, help='Your Hugging Face token for diarization.')
-@click.option('--einfra-apikey', required=True, help='Your E-infra AIaaS API key for translation.')
 @click.option('--einfra-baseurl', default='https://llm.ai.e-infra.cz/v1', help='Base URL for E-infra AIaaS API.')
+@click.option('--einfra-apikey', required=True, help='Your E-infra AIaaS API key for translation.')
 @click.option('--translating-model', default='aya-expanse', help='Model to use for translation from ENG to CZ.')
 @click.option('--temperature', default=0.1, help='Temperature setting for translation model.')
 @click.option('--max-tokens', default=2048, help='Max tokens for translation output.')
@@ -17,16 +17,38 @@ def main(audio_file, hf_token, einfra_apikey, einfra_baseurl, translating_model,
     DABUJ: Automated AI/ML pipeline for dubbing.
     Runs the WhisperX transcription and diarization pipeline.
     """
-    click.echo(f"=====================================================================")
+    click.echo(f"==================================================================================")
     click.echo(f">>> Processing of `{audio_file}` has started! <<<")
-    click.echo(f"=====================================================================")
+    click.echo(f"==================================================================================")
 
-    # Call the logic from your other file
+    click.echo(f"\n>>> Phase 1: Transcription and Diarization")
+    click.echo(f"----------------------------------------------------------------------------------")
+
     segments = transcribe_and_diarize(audio_file, hf_token)
 
-    click.echo("\n--- DIARIZATION FINAL OUTPUT ---")
+    click.echo("\n>>> Final output of Phase 1 (Diarization):::")
     for segment in segments:
         click.echo(f"[{segment.get('start'):.2f} - {segment.get('end'):.2f}] Speaker {segment.get('speaker', 'UNKNOWN')}: {segment.get('text')}")
+
+
+    if not click.prompt("\nDo you want to proceed to Phase 2 - Translation?", default=True, show_default=True):
+      click.echo("Aborting the execution. The program exits soon.")
+      return
+
+    click.echo(f"\n>>> Phase 2: Translation")
+    click.echo(f"----------------------------------------------------------------------------------")
+
+    for segment in segments:
+        eng_text = segment["text"]
+
+        cz_text = translation_request(einfra_baseurl, einfra_apikey, translating_model, temperature, max_tokens,eng_text, content_desc)
+
+        segment["text"] = cz_text
+
+    click.echo("\n>>> Final output of Phase 2 (Translation):::")
+    for segment in segments:
+        click.echo(f"[{segment.get('start'):.2f} - {segment.get('end'):.2f}] Speaker {segment.get('speaker', 'UNKNOWN')}: {segment.get('text')}")
+
 
 if __name__ == '__main__':
     main()

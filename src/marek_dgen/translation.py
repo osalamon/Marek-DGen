@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-def translation_request(base_url: str, einfra_api_key: str, translating_model: str, text_segment: str, content_desc: str, temperature: float, max_tokens: int):
+def translation_request(base_url: str, einfra_api_key: str, translating_model: str, temperature: float, max_tokens: int, text_segment: str, content_desc: str):
   client = OpenAI(
     base_url = base_url,
     api_key = einfra_api_key
@@ -22,7 +22,7 @@ def translation_request(base_url: str, einfra_api_key: str, translating_model: s
     # "qwen3-reranker-4b", "qwen3-embedding-4b", "mxbai-embed-large:latest",
     # "multilingual-e5-large-instruct", "deepseek-v3.2", "deepseek-v3.2-thinking",
     # "qwen3.5", "gpt-oss-120b", "glm-5", "kimi-k2.5", "qwen3.5-122b"
-  	"model": "aya-expanse", # translating_model,
+  	"model": translating_model, # "aya-expanse"
   	"messages": [
   		{
   			"role": "system",

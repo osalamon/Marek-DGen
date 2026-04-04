@@ -1,4 +1,5 @@
 from openai import OpenAI
+import unicodedata
 
 def translation_request(base_url: str, einfra_api_key: str, translating_model: str, temperature: float, max_tokens: int, text_segment: str, content_desc: str):
   client = OpenAI(
@@ -33,9 +34,11 @@ def translation_request(base_url: str, einfra_api_key: str, translating_model: s
   			"content": text_segment
   		}
   	],
-  	"temperature": temperature, 	# 0.2, # adjust as needed
+  	"temperature": temperature, 	# 0.1, # adjust as needed
   	"max_tokens": max_tokens 			# lower max tokens for shorter translations, adjust as needed
   }
   response = client.chat.completions.create(**prompt)
+  raw_response = response.choices[0].message.content.strip()
+  normalized_response = unicodedata.normalize('NFC', raw_response)
 
-  return response.choices[0].message.content.strip()
+  return normalized_response

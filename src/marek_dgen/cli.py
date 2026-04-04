@@ -10,8 +10,8 @@ content_desc = "conversation in the episode nr. 311 of the Peter Attia's podcast
 @click.option('--einfra-baseurl', default='https://llm.ai.e-infra.cz/v1', help='Base URL for E-infra AIaaS API.')
 @click.option('--einfra-apikey', required=True, help='Your E-infra AIaaS API key for translation.')
 @click.option('--translating-model', default='aya-expanse', help='Model to use for translation from ENG to CZ.')
-@click.option('--temperature', default=0.1, help='Temperature setting for translation model.')
-@click.option('--max-tokens', default=2048, help='Max tokens for translation output.')
+@click.option('--temperature', default=0.05, help='Temperature setting for translation model.')
+@click.option('--max-tokens', default=75, help='Max tokens for translation output.')
 def main(audio_file, hf_token, einfra_apikey, einfra_baseurl, translating_model, temperature, max_tokens):
     """
     DABUJ: Automated AI/ML pipeline for dubbing.
@@ -27,11 +27,12 @@ def main(audio_file, hf_token, einfra_apikey, einfra_baseurl, translating_model,
     segments = transcribe_and_diarize(audio_file, hf_token)
 
     click.echo("\n>>> Final output of Phase 1 (Diarization):::")
+    long_transcript = ""
     for segment in segments:
-        click.echo(f"[{segment.get('start'):.2f} - {segment.get('end'):.2f}] Speaker {segment.get('speaker', 'UNKNOWN')}: {segment.get('text')}")
+        long_transcript += f"[{segment.get('start'):.2f} - {segment.get('end'):.2f}] Speaker {segment.get('speaker', 'UNKNOWN')}: {segment.get('text')}\n"
+    click.echo_via_pager(long_transcript)
 
-
-    if not click.prompt("\nDo you want to proceed to Phase 2 - Translation?", default=True, show_default=True):
+    if not click.confirm("\nDo you want to proceed to Phase 2 - Translation?", default=True, show_default=True):
       click.echo("Aborting the execution. The program exits soon.")
       return
 
@@ -46,9 +47,10 @@ def main(audio_file, hf_token, einfra_apikey, einfra_baseurl, translating_model,
         segment["text"] = cz_text
 
     click.echo("\n>>> Final output of Phase 2 (Translation):::")
+    long_translation = ""
     for segment in segments:
-        click.echo(f"[{segment.get('start'):.2f} - {segment.get('end'):.2f}] Speaker {segment.get('speaker', 'UNKNOWN')}: {segment.get('text')}")
-
+        long_translation += f"[{segment.get('start'):.2f} - {segment.get('end'):.2f}] Speaker {segment.get('speaker', 'UNKNOWN')}: {segment.get('text')}\n"
+    click.echo_via_pager(long_translation)
 
 if __name__ == '__main__':
     main()

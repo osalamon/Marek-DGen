@@ -1,6 +1,7 @@
 import click
 from marek_dgen.transcriber import transcribe_and_diarize
 from marek_dgen.translation import translation_request
+from TTS.api import TTS
 
 content_desc = "conversation in the episode nr. 311 of the Peter Attia's podcast Drive called Longevity 101 where he concisely summarize results of his more than one decade lasting research into human longevity"
 
@@ -17,6 +18,12 @@ def main(audio_file, hf_token, einfra_apikey, einfra_baseurl, translating_model,
     DABUJ: Automated AI/ML pipeline for dubbing.
     Runs the WhisperX transcription and diarization pipeline.
     """
+    click.echo(f"==================================================================================")
+    tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to("cuda")
+    print(tts.list_models())
+    click.echo(f"==================================================================================")
+
+
     click.echo(f"==================================================================================")
     click.echo(f">>> Processing of `{audio_file}` has started! <<<")
     click.echo(f"==================================================================================")

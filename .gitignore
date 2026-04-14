@@ -209,3 +209,4 @@ __marimo__/
 # data files and intermediate outpus
 data/
 output/
+.aider*

@@ -13,6 +13,7 @@ content_desc = "conversation in the episode nr. 311 of the Peter Attia's podcast
 @click.option('--translating-model', default='aya-expanse', help='Model to use for translation from ENG to CZ.')
 @click.option('--temperature', default=0.05, help='Temperature setting for translation model.')
 @click.option('--max-tokens', default=75, help='Max tokens for translation output.')
+@click.option('--voices', default=None, help='Comma-separated list of speaker voices for TTS (e.g. "speaker1,speaker2"). The speakers will be assigned voices exactly in the same order as they appear in the transcript. If not provided, voices will be assigned to speaker randomly.')
 def main(audio_file, hf_token, einfra_apikey, einfra_baseurl, translating_model, temperature, max_tokens):
     """
     DABUJ: Automated AI/ML pipeline for dubbing.

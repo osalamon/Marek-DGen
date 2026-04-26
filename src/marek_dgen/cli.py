@@ -21,7 +21,7 @@ content_desc_default = "conversation in the episode nr. 311 of the Peter Attia's
 )
 @click.option(
     "--translating-model",
-    default="aya-expanse",
+    default="deepseek-v3.2",
     help="Model to use for translation from ENG to CZ.",
 )
 @click.option(

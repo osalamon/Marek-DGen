@@ -32,5 +32,9 @@
     "output": {
         "directory": "output",
         "naming_pattern": "{speaker}_{index}.wav"
+    },
+    "assembly": {
+        "video_suffix": "_CZ",
+        "output_format": "mp4"
     }
 }

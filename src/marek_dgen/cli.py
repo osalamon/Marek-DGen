@@ -4,6 +4,8 @@ from marek_dgen.transcriber import transcribe_and_diarize
 from marek_dgen.translation import translation_request
 from marek_dgen.tts import synthesize_segment
 from marek_dgen.utils.config import load_config, AppConfig
+from marek_dgen.utils.create_manifest import create_manifest
+from marek_dgen.assembly import assemble_dubbed_video
 from TTS.api import TTS
 
 content_desc_default = "conversation in the episode nr. 311 of the Peter Attia's podcast Drive called Longevity 101 where he concisely summarize results of his more than one decade lasting research into human longevity"
@@ -216,19 +218,34 @@ def main(
     click.echo("\nInitializing TTS model (this may take a while)...")
     tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to("cuda")
 
-    # Generate audio for each segment
-    generated_files = []
+    # Generate audio for each segment and collect manifest entries
+    manifest_entries = []
+    generated_count = 0
     for i, segment in enumerate(segments):
         speaker = segment.get('speaker', 'UNKNOWN')
         text = segment['text']
         speaker_wav = speaker_to_wav.get(speaker)
 
+        entry = {
+            "index": i,
+            "start": segment.get("start", 0.0),
+            "end": segment.get("end", 0.0),
+            "speaker": speaker,
+            "text": text,
+        }
+
         if not speaker_wav:
             click.echo(f"Warning: No voice mapping for {speaker}, skipping segment {i}")
+            entry["wav_path"] = None
+            entry["skipped"] = True
+            manifest_entries.append(entry)
             continue
 
         if not text or not text.strip():
             click.echo(f"Warning: Empty text for segment {i}, skipping")
+            entry["wav_path"] = None
+            entry["skipped"] = True
+            manifest_entries.append(entry)
             continue
 
         output_filename = app_config.output.naming_pattern.format(
@@ -245,10 +262,25 @@ def main(
             output_path=str(output_path),
             language=app_config.tts.language,
         )
-        generated_files.append(str(output_path))
+        generated_count += 1
+        entry["wav_path"] = str(output_path.relative_to(output_dir))
+        entry["skipped"] = False
+        manifest_entries.append(entry)
 
     click.echo(f"\n>>> PHASE 3 FINISHED WITH SUCCESS! <<<")
-    click.echo(f"Generated {len(generated_files)} audio files in {output_dir.absolute()}")
+    click.echo(f"Generated {generated_count} audio files in {output_dir.absolute()}")
+
+    # Create manifest and assemble final video
+    manifest_path = create_manifest(manifest_entries, output_dir)
+    click.echo(f"Manifest written to: {manifest_path}")
+
+    final_video_path = assemble_dubbed_video(
+        manifest_path=manifest_path,
+        original_video=Path(audio_file),
+        output_dir=output_dir,
+        assembly_config=app_config.assembly,
+    )
+    click.echo(f"Final dubbed video written to: {final_video_path}")
 
 
 if __name__ == "__main__":

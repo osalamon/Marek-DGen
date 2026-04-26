@@ -21,11 +21,17 @@ class OutputConfig(BaseModel):
     naming_pattern: str = "{speaker}_{index}.wav"
 
 
+class AssemblyConfig(BaseModel):
+    video_suffix: str = "_CZ"
+    output_format: str = "mp4"
+
+
 class AppConfig(BaseModel):
     content_description: str = ""
     translation: TranslationConfig = Field(default_factory=TranslationConfig)
     tts: TTSConfig
     output: OutputConfig = Field(default_factory=OutputConfig)
+    assembly: AssemblyConfig = Field(default_factory=AssemblyConfig)
 
 
 def load_config(path: str | Path) -> AppConfig:

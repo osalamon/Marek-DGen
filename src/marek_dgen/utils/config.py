@@ -4,6 +4,13 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 
+class TranscriptionConfig(BaseModel):
+    device: str | None = None
+    batch_size: int | None = None
+    compute_type: str | None = None
+    speakers_count: int | None = 2
+
+
 class TranslationConfig(BaseModel):
     default_model: str = "qwen3.5"
     default_temperature: float = 0.05
@@ -28,6 +35,7 @@ class AssemblyConfig(BaseModel):
 
 class AppConfig(BaseModel):
     content_description: str = ""
+    transcription: TranscriptionConfig = Field(default_factory=TranscriptionConfig)
     translation: TranslationConfig = Field(default_factory=TranslationConfig)
     tts: TTSConfig
     output: OutputConfig = Field(default_factory=OutputConfig)

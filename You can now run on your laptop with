@@ -1,0 +1,1 @@
+dabuj data/longevity101cut.mp4 --hf-token <token> --einfra-apikey <key> --device cpu --batch-size 1

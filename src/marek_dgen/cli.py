@@ -23,6 +23,28 @@ content_desc_default = "conversation in the episode nr. 311 of the Peter Attia's
     "--hf-token", required=True, help="Your Hugging Face token for diarization."
 )
 @click.option(
+    "--device",
+    default=None,
+    help='Device to use for transcription/diarization: "cuda", "cpu", or omit to auto-detect.',
+)
+@click.option(
+    "--batch-size",
+    default=None,
+    type=int,
+    help="Batch size for WhisperX transcription. Reduce to 1 if low on GPU/CPU memory.",
+)
+@click.option(
+    "--compute-type",
+    default=None,
+    help='WhisperX compute type: "int8", "float16", "float32". int8 uses least VRAM.',
+)
+@click.option(
+    "--speakers-count",
+    default=None,
+    type=int,
+    help="Expected number of speakers. Set to None/omit if unknown.",
+)
+@click.option(
     "--einfra-baseurl",
     default="https://llm.ai.e-infra.cz/v1",
     help="Base URL for E-infra AIaaS API.",
@@ -53,6 +75,10 @@ def main(
     audio_file,
     config,
     hf_token,
+    device,
+    batch_size,
+    compute_type,
+    speakers_count,
     einfra_apikey,
     einfra_baseurl,
     translating_model,
@@ -73,6 +99,11 @@ def main(
     if not content_desc:
         content_desc = content_desc_default
 
+    device = device if device is not None else app_config.transcription.device
+    batch_size = batch_size if batch_size is not None else app_config.transcription.batch_size
+    compute_type = compute_type if compute_type is not None else app_config.transcription.compute_type
+    speakers_count = speakers_count if speakers_count is not None else app_config.transcription.speakers_count
+
     translating_model = translating_model if translating_model is not None else app_config.translation.default_model
     temperature = temperature if temperature is not None else app_config.translation.default_temperature
     max_tokens = max_tokens if max_tokens is not None else app_config.translation.default_max_tokens
@@ -82,6 +113,7 @@ def main(
     )
     click.echo(f"Configuration loaded from: {config}")
     click.echo(f"Content description: {content_desc[:80]}...")
+    click.echo(f"Transcription device: {device} | batch_size: {batch_size} | compute_type: {compute_type} | speakers: {speakers_count}")
     click.echo(f"Translation model: {translating_model} | temp: {temperature} | max_tokens: {max_tokens}")
     click.echo(
         f"=================================================================================="
@@ -101,7 +133,14 @@ def main(
         f"----------------------------------------------------------------------------------"
     )
 
-    segments = transcribe_and_diarize(audio_file, hf_token)
+    segments = transcribe_and_diarize(
+        audio_file,
+        hf_token,
+        device=device,
+        batch_size=batch_size,
+        compute_type=compute_type,
+        speakers_count=speakers_count,
+    )
 
     click.echo("\n>>> Final output of Phase 1 (Transcribe & Diarize):::")
     long_transcript = ""

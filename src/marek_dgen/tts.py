@@ -1,14 +1,31 @@
+from pathlib import Path
 from TTS.api import TTS
 
-def text_to_speech(text: str, speakers: list):
-	device = "cuda" # or "cpu"
 
-	# Init TTS
-	tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(device)
+def synthesize_segment(
+    tts_model: TTS,
+    text: str,
+    speaker_wav: str,
+    output_path: str,
+    language: str = "cs",
+) -> str:
+    """Synthesize a single text segment to speech and save to a WAV file.
 
-	# Run TTS
-	# ❗ Since this model is multi-lingual voice cloning model, we must set the target speaker_wav and language
-	# Text to speech list of amplitude values as output
-	wav = tts.tts(text="Hello world!", speaker_wav="my/cloning/audio.wav", language="en")
-	# Text to speech to a file
-	tts.tts_to_file(text="Hello world!", speaker_wav="my/cloning/audio.wav", language="en", file_path="output.wav")
+    Args:
+        tts_model: An initialized TTS model instance.
+        text: The text to synthesize (Czech).
+        speaker_wav: Path to the speaker reference audio file.
+        output_path: Destination file path for the generated audio.
+        language: Target language code (default: "cs").
+
+    Returns:
+        The output file path.
+    """
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    tts_model.tts_to_file(
+        text=text,
+        speaker_wav=speaker_wav,
+        language=language,
+        file_path=output_path,
+    )
+    return output_path

@@ -29,6 +29,7 @@ def translation_request(
   - Do not complete unfinished sentences or add missing information, even if you know the context.
   - Do not add any extra explanations, notes, or conversational filler.
   - Return ONLY the translated Czech text.
+  - Every digit or number has to be written as word, not as numeric symbol. For example, not x:y but always transform for example '19.' to the textual 'devatenáctého'" 
   """
 
     prompt = {

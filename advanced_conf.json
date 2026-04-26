@@ -1,0 +1,25 @@
+{
+    "content_desccription": "These are thoughts of Steve Klabnik (the author of Rust) on topics like figuring out what he thinks about AI, and the implications of it for society, technology, and software development.",
+    "voices_mapping": [
+        {
+            "ctvrtnicek": "voices/m01ctv.wav",
+            "moravec": "",
+            "steindler": "",
+            "zeman": "",
+            "noname-muz-eup1": "",
+            "noname-muz-eup2": "",
+            "noname-muz-karvina": "",
+            "noname-muz-fm": "",
+            "noname-muz-ova": "voices/m09ova.wav",
+            "mucha": "voices/z01muc.wav",
+            "holubova": "",
+            "kopecka": "",
+            "vasaryova": "",
+            "noname-zena-eup1": "",
+            "noname-zena-eup2": "",
+            "noname-zena-fm1": "",
+            "noname-zena-fm2": "",
+            "noname-zena-pribor": "voices/z09pri.wav"
+        }
+    ]
+}

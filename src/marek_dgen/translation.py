@@ -11,7 +11,14 @@ def translation_request(
     max_tokens: int,
     text_segment: str,
 ):
-    client = OpenAI(base_url=base_url, api_key=einfra_api_key)
+    # 120 s total timeout + 2 retries on transient failures.
+    # Lower the timeout if you want faster failure detection.
+    client = OpenAI(
+        base_url=base_url,
+        api_key=einfra_api_key,
+        timeout=120.0,
+        max_retries=2,
+    )
 
     system_prompt = f"""
   You are an expert English to Czech translator.
@@ -37,7 +44,14 @@ def translation_request(
         "temperature": temperature,  # 0.1, # adjust as needed
         "max_tokens": max_tokens,  # lower max tokens for shorter translations, adjust as needed
     }
-    response = client.chat.completions.create(**prompt)
+
+    try:
+        response = client.chat.completions.create(**prompt)
+    except Exception as exc:
+        raise RuntimeError(
+            f"Translation API call failed for segment: {text_segment[:80]}..."
+        ) from exc
+
     raw_response = response.choices[0].message.content.strip()
     normalized_response = unicodedata.normalize("NFC", raw_response)
 

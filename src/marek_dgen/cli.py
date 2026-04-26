@@ -170,8 +170,9 @@ def main(
         f"----------------------------------------------------------------------------------"
     )
 
-    for segment in segments:
+    for i, segment in enumerate(segments):
         eng_text = segment["text"]
+        click.echo(f"[{i+1}/{len(segments)}] Translating: {eng_text[:60]}...")
 
         cz_text = translation_request(
             content_desc,

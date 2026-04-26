@@ -1,65 +1,11 @@
 import json
-import subprocess
 import tempfile
 from pathlib import Path
 
 from marek_dgen.utils.config import AssemblyConfig
-
-
-def _run_ffmpeg_command(cmd: list[str]) -> None:
-    """Run an ffmpeg/ffprobe command and raise on failure with stderr."""
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"Command failed: {' '.join(cmd)}\n"
-            f"stderr: {result.stderr}\n"
-            f"stdout: {result.stdout}"
-        )
-
-
-def _probe_audio_format(wav_path: Path) -> tuple[int, str]:
-    """Return (sample_rate, channel_layout) for a WAV file."""
-    cmd = [
-        "ffprobe",
-        "-v",
-        "error",
-        "-select_streams",
-        "a:0",
-        "-show_entries",
-        "stream=sample_rate,channels",
-        "-of",
-        "json",
-        str(wav_path),
-    ]
-    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    info = json.loads(result.stdout)
-    stream = info["streams"][0]
-    sample_rate = int(stream["sample_rate"])
-    channels = int(stream["channels"])
-    layout = "stereo" if channels >= 2 else "mono"
-    return sample_rate, layout
-
-
-def _generate_silence(
-    duration: float, sample_rate: int, layout: str, out_path: Path
-) -> None:
-    """Generate a silent WAV file of the given duration."""
-    cmd = [
-        "ffmpeg",
-        "-y",
-        "-f",
-        "lavfi",
-        "-i",
-        f"anullsrc=r={sample_rate}:cl={layout}",
-        "-t",
-        str(duration),
-        "-acodec",
-        "pcm_s16le",
-        "-ar",
-        str(sample_rate),
-        str(out_path),
-    ]
-    _run_ffmpeg_command(cmd)
+from marek_dgen.utils.audio_probe import probe_audio_format
+from marek_dgen.utils.ffmpeg_runner import run_ffmpeg_command
+from marek_dgen.utils.silence_generator import generate_silence
 
 
 def assemble_dubbed_video(
@@ -81,7 +27,7 @@ def assemble_dubbed_video(
         raise ValueError("No audio segments found in manifest to assemble.")
 
     first_wav = output_dir / entries[0]["wav_path"]
-    sample_rate, layout = _probe_audio_format(first_wav)
+    sample_rate, layout = probe_audio_format(first_wav)
 
     with tempfile.TemporaryDirectory(
         dir=output_dir, prefix="tmp_assembly_"
@@ -93,7 +39,7 @@ def assemble_dubbed_video(
         first_start = float(entries[0]["start"])
         if first_start > 0:
             silence_path = tmpdir_path / "silence_start.wav"
-            _generate_silence(first_start, sample_rate, layout, silence_path)
+            generate_silence(first_start, sample_rate, layout, silence_path)
             concat_items.append(str(silence_path.resolve()))
 
         for i, entry in enumerate(entries):
@@ -104,7 +50,7 @@ def assemble_dubbed_video(
                 gap = float(entries[i + 1]["start"]) - float(entry["end"])
                 if gap > 0:
                     silence_path = tmpdir_path / f"silence_{i}.wav"
-                    _generate_silence(gap, sample_rate, layout, silence_path)
+                    generate_silence(gap, sample_rate, layout, silence_path)
                     concat_items.append(str(silence_path.resolve()))
 
         # Write ffmpeg concat demuxer list
@@ -131,7 +77,7 @@ def assemble_dubbed_video(
             str(sample_rate),
             str(dubbed_wav),
         ]
-        _run_ffmpeg_command(concat_cmd)
+        run_ffmpeg_command(concat_cmd)
 
         # Mux dubbed audio with original video
         suffix = assembly_config.video_suffix
@@ -154,6 +100,6 @@ def assemble_dubbed_video(
             "1:a:0",
             str(final_video_path),
         ]
-        _run_ffmpeg_command(mux_cmd)
+        run_ffmpeg_command(mux_cmd)
 
     return final_video_path

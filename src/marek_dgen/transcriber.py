@@ -2,11 +2,13 @@ import torch
 
 # PyTorch 2.6+ defaults torch.load to weights_only=True, which breaks
 # loading of older whisperx / pyannote checkpoints that contain
-# non-standard globals (e.g. omegaconf).  Restore the pre-2.6 default.
+# non-standard globals (e.g. omegaconf).  Force the old behavior.
 _original_torch_load = torch.load
 def _patched_torch_load(*args, **kwargs):
-    if "weights_only" not in kwargs:
-        kwargs["weights_only"] = False
+    # Force weights_only=False even if the caller explicitly passes True,
+    # because third-party checkpoints (pyannote, whisperx) contain
+    # non-standard globals that PyTorch's safe unpickler rejects.
+    kwargs["weights_only"] = False
     return _original_torch_load(*args, **kwargs)
 torch.load = _patched_torch_load
 
@@ -51,7 +53,7 @@ def transcribe_and_diarize(audio_file: str, hf_token: str):
 	del model_align
 
 	print(f">>>3. Assigning speaker labels (diarization)...")
-	diarize_model = DiarizationPipeline(token=hf_token, device=device)
+	diarize_model = DiarizationPipeline(use_auth_token=hf_token, device=device)
 	diarize_segments = diarize_model(audio, min_speakers=speakers_count, max_speakers=speakers_count)
 	result = whisperx.assign_word_speakers(diarize_segments, result)
 

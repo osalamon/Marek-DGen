@@ -11,3 +11,8 @@ dabuj data/whisperx2mintest.mp4 \														# input English video to be dubbe
 			--translating-model="qwen3.5-122b" \
 			--voices="ctvrtnicek,moravec,steindler,zeman,mucha,holubova,kopecka,vasaryova" \
 			--output-dir="output/czdabing.wav"
+Just a silly little ML pipeline intended for translating and dubbing the most important epizodes of my favourite podcasts, making them accessible for member of my family, who is not very well versed in English.
+
+## Status: work in progress, there're only last two steps of pipeline missing
+- TTS is almost finished
+- the last missing piece: assembling audio/video files back via ffmpeg

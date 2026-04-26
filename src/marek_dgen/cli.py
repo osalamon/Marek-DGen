@@ -8,8 +8,6 @@ from marek_dgen.utils.create_manifest import create_manifest
 from marek_dgen.assembly import assemble_dubbed_video
 from TTS.api import TTS
 
-content_desc_default = "conversation in the episode nr. 311 of the Peter Attia's podcast Drive called Longevity 101 where he concisely summarize results of his more than one decade lasting research into human longevity"
-
 
 @click.command()
 @click.argument("audio_file", type=click.Path(exists=True))
@@ -58,9 +56,14 @@ content_desc_default = "conversation in the episode nr. 311 of the Peter Attia's
     help="Model to use for translation from ENG to CZ.",
 )
 @click.option(
-    "--temperature", default=None, type=float, help="Temperature setting for translation model."
+    "--temperature",
+    default=None,
+    type=float,
+    help="Temperature setting for translation model.",
 )
-@click.option("--max-tokens", default=None, type=int, help="Max tokens for translation output.")
+@click.option(
+    "--max-tokens", default=None, type=int, help="Max tokens for translation output."
+)
 @click.option(
     "--voices",
     default=None,
@@ -95,26 +98,56 @@ def main(
     app_config: AppConfig = load_config(config)
 
     # Resolve settings: CLI overrides config defaults
-    content_desc = content_description if content_description is not None else app_config.content_description
+    content_desc = (
+        content_description
+        if content_description is not None
+        else app_config.content_description
+    )
     if not content_desc:
         content_desc = content_desc_default
 
     device = device if device is not None else app_config.transcription.device
-    batch_size = batch_size if batch_size is not None else app_config.transcription.batch_size
-    compute_type = compute_type if compute_type is not None else app_config.transcription.compute_type
-    speakers_count = speakers_count if speakers_count is not None else app_config.transcription.speakers_count
+    batch_size = (
+        batch_size if batch_size is not None else app_config.transcription.batch_size
+    )
+    compute_type = (
+        compute_type
+        if compute_type is not None
+        else app_config.transcription.compute_type
+    )
+    speakers_count = (
+        speakers_count
+        if speakers_count is not None
+        else app_config.transcription.speakers_count
+    )
 
-    translating_model = translating_model if translating_model is not None else app_config.translation.default_model
-    temperature = temperature if temperature is not None else app_config.translation.default_temperature
-    max_tokens = max_tokens if max_tokens is not None else app_config.translation.default_max_tokens
+    translating_model = (
+        translating_model
+        if translating_model is not None
+        else app_config.translation.default_model
+    )
+    temperature = (
+        temperature
+        if temperature is not None
+        else app_config.translation.default_temperature
+    )
+    max_tokens = (
+        max_tokens
+        if max_tokens is not None
+        else app_config.translation.default_max_tokens
+    )
 
     click.echo(
         f"=================================================================================="
     )
     click.echo(f"Configuration loaded from: {config}")
     click.echo(f"Content description: {content_desc[:80]}...")
-    click.echo(f"Transcription device: {device} | batch_size: {batch_size} | compute_type: {compute_type} | speakers: {speakers_count}")
-    click.echo(f"Translation model: {translating_model} | temp: {temperature} | max_tokens: {max_tokens}")
+    click.echo(
+        f"Transcription device: {device} | batch_size: {batch_size} | compute_type: {compute_type} | speakers: {speakers_count}"
+    )
+    click.echo(
+        f"Translation model: {translating_model} | temp: {temperature} | max_tokens: {max_tokens}"
+    )
     click.echo(
         f"=================================================================================="
     )
@@ -172,7 +205,7 @@ def main(
 
     for i, segment in enumerate(segments):
         eng_text = segment["text"]
-        click.echo(f"[{i+1}/{len(segments)}] Translating: {eng_text[:60]}...")
+        click.echo(f"[{i + 1}/{len(segments)}] Translating: {eng_text[:60]}...")
 
         cz_text = translation_request(
             content_desc,
@@ -222,7 +255,7 @@ def main(
     unique_speakers = []
     seen = set()
     for segment in segments:
-        spk = segment.get('speaker', 'UNKNOWN')
+        spk = segment.get("speaker", "UNKNOWN")
         if spk not in seen:
             seen.add(spk)
             unique_speakers.append(spk)
@@ -262,8 +295,8 @@ def main(
     manifest_entries = []
     generated_count = 0
     for i, segment in enumerate(segments):
-        speaker = segment.get('speaker', 'UNKNOWN')
-        text = segment['text']
+        speaker = segment.get("speaker", "UNKNOWN")
+        text = segment["text"]
         speaker_wav = speaker_to_wav.get(speaker)
 
         entry = {
@@ -289,12 +322,13 @@ def main(
             continue
 
         output_filename = app_config.output.naming_pattern.format(
-            speaker=speaker.replace(" ", "_"),
-            index=i
+            speaker=speaker.replace(" ", "_"), index=i
         )
         output_path = output_dir / output_filename
 
-        click.echo(f"[{i+1}/{len(segments)}] Synthesizing {speaker} -> {output_path.name}")
+        click.echo(
+            f"[{i + 1}/{len(segments)}] Synthesizing {speaker} -> {output_path.name}"
+        )
         synthesize_segment(
             tts_model=tts,
             text=text,

@@ -13,6 +13,8 @@ def post_process_numbers(text: str) -> str:
         "20.": "dvacáté",
         "2.0": "dva nula",
         "3.0": "tři nula",
+        "3": "tři",
+        "2": "dva",
     }
     for old, new in replacements.items():
         text = text.replace(old, new)

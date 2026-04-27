@@ -14,10 +14,8 @@ def post_process_numbers(text: str) -> str:
         "2.0": "dva nula",
         "3.0": "tři nula",
     }
-
     for old, new in replacements.items():
         text = text.replace(old, new)
-
     return text
 
 
@@ -35,7 +33,7 @@ def translation_request(
     client = OpenAI(
         base_url=base_url,
         api_key=einfra_api_key,
-        timeout=120.0,
+        timeout=60.0,
         max_retries=2,
     )
 
@@ -56,7 +54,7 @@ def translation_request(
         # "qwen3-reranker-4b", "qwen3-embedding-4b", "mxbai-embed-large:latest",
         # "multilingual-e5-large-instruct", "deepseek-v3.2", "deepseek-v3.2-thinking",
         # "qwen3.5", "gpt-oss-120b", "glm-5", "kimi-k2.5", "qwen3.5-122b"
-        "model": translating_model,  # "aya-expanse"
+        "model": translating_model,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": text_segment},

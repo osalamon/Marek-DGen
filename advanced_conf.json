@@ -7,24 +7,9 @@
     },
     "tts": {
         "voices_mapping": {
-            "ctvrtnicek": "voices/m01ctv.wav",
-            "moravec": "voices/m02mor.wav",
-            "steindler": "voices/m03ste.wav",
-            "zeman": "voices/m04zem.wav",
-            "noname-muz-eup1": "voices/m05eupB.wav",
-            "noname-muz-eup2": "voices/m06eup.wav",
-            "noname-muz-karvina": "voices/m07karB.wav",
-            "noname-muz-fm": "voices/m08f-m.wav",
-            "noname-muz-ova": "voices/m09ova.wav",
-            "mucha": "voices/z01muc.wav",
-            "holubova": "voices/z02hol.wav",
-            "kopecka": "voices/z03kop.wav",
-            "vasaryova": "voices/z04vas.wav",
-            "noname-zena-eup1": "voices/z05eupB.wav",
-            "noname-zena-eup2": "voices/z06eup.wav",
-            "noname-zena-fm1": "voices/z07f-mB.wav",
-            "noname-zena-fm2": "voices/z08f-m.wav",
-            "noname-zena-pribor": "voices/z09pri.wav"
+            "brother": "voices/brother.wav",
+            "salam": "voices/salam.wav",
+            "salamlow": "voices/salamlow.wav"
         },
         "language": "cs",
         "output_format": "wav"

@@ -136,7 +136,7 @@ def main(
     )
 
     click.echo(
-        f"=================================================================================="
+        f"========================================================================================"
     )
     click.echo(f"Configuration loaded from: {config}")
     click.echo(f"Content description: {content_desc[:80]}...")
@@ -147,21 +147,21 @@ def main(
         f"Translation model: {translating_model} | temp: {temperature} | max_tokens: {max_tokens}"
     )
     click.echo(
-        f"=================================================================================="
+        f"========================================================================================"
     )
 
     # PHASE 1 - TRANSCRIPT + DIARIZE
     click.echo(
-        f"\n=================================================================================="
+        f"\n======================================================================================"
     )
     click.echo(f">>> Processing of `{audio_file}` has started! <<<")
     click.echo(
-        f"=================================================================================="
+        f"========================================================================================"
     )
 
     click.echo(f"\n\n>>> Phase 1: Transcription and Diarization")
     click.echo(
-        f"----------------------------------------------------------------------------------"
+        f"----------------------------------------------------------------------------------------"
     )
 
     segments = transcribe_and_diarize(
@@ -198,7 +198,7 @@ def main(
 
     click.echo(f"\n\n>>> Phase 2: Translation")
     click.echo(
-        f"----------------------------------------------------------------------------------"
+        f"----------------------------------------------------------------------------------------"
     )
 
     for i, segment in enumerate(segments):
@@ -226,10 +226,10 @@ def main(
     # PHASE 3 - TTS
     click.echo(f"\n>>> PHASE 2 FINISHED WITH SUCCESS! <<<")
     click.echo(
-        f"--- The transcript was translated from English to Czech by the chosen LLM. ---"
+        f"-------- The transcript was translated from English to Czech by the chosen LLM. --------"
     )
     click.echo(
-        f"--------------------------------------------------------------------------------------------------------------------------------------------"
+        f"----------------------------------------------------------------------------------------"
     )
 
     if not click.confirm(
@@ -242,7 +242,7 @@ def main(
 
     click.echo(f"\n\n>>> Phase 3: Performing Text to Speech")
     click.echo(
-        f"----------------------------------------------------------------------------------"
+        f"----------------------------------------------------------------------------------------"
     )
 
     # Prepare output directory
@@ -341,6 +341,9 @@ def main(
 
     click.echo(f"\n>>> PHASE 3 FINISHED WITH SUCCESS! <<<")
     click.echo(f"Generated {generated_count} audio files in {output_dir.absolute()}")
+    click.echo(
+        f"----------------------------------------------------------------------------------------"
+    )
 
     # Create manifest and assemble final video
     manifest_path = create_manifest(manifest_entries, output_dir)
@@ -352,7 +355,13 @@ def main(
         output_dir=output_dir,
         assembly_config=app_config.assembly,
     )
-    click.echo(f"Final dubbed video written to: {final_video_path}")
+    click.echo(
+        f"\n======================================================================================"
+    )
+    click.echo(f"\n>>> Final dubbed video written to: {final_video_path} <<<")
+    click.echo(
+        f"\n========================================================================================"
+    )
 
 
 if __name__ == "__main__":

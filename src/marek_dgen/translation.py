@@ -11,10 +11,13 @@ def post_process_numbers(text: str) -> str:
     replacements = {
         "19.": "devatenácté",
         "20.": "dvacáté",
+        "21.": "dvacátéprvní",
+        "1.0": "jedna nula",
         "2.0": "dva nula",
         "3.0": "tři nula",
         "3": "tři",
         "2": "dva",
+        "1": "jedna",
     }
     for old, new in replacements.items():
         text = text.replace(old, new)

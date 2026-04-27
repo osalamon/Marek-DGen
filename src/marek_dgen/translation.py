@@ -1,5 +1,48 @@
 from openai import OpenAI
+import re
 import unicodedata
+
+from num2words import num2words
+
+
+_CZECH_DIGITS = {
+    "0": "nula",
+    "1": "jedna",
+    "2": "dva",
+    "3": "tři",
+    "4": "čtyři",
+    "5": "pět",
+    "6": "šest",
+    "7": "sedm",
+    "8": "osm",
+    "9": "devět",
+}
+
+
+def _digits_to_words(match: re.Match) -> str:
+    """Convert dotted numbers like 2.0 to 'dva nula'."""
+    return " ".join(_CZECH_DIGITS[ch] for ch in match.group(0) if ch in _CZECH_DIGITS)
+
+
+def _ordinal_to_words(match: re.Match) -> str:
+    """Convert an ordinal like 19. to a Czech ordinal word."""
+    return num2words(int(match.group(1)), lang="cz", to="ordinal")
+
+
+def _cardinal_to_words(match: re.Match) -> str:
+    """Convert a cardinal number to a Czech word."""
+    return num2words(int(match.group(0)), lang="cz")
+
+
+def post_process_numbers(text: str) -> str:
+    """Convert remaining numeric patterns in translated text to Czech words."""
+    # 1. Dotted versions / decimals: 2.0, 3.0 -> dva nula, tři nula
+    text = re.sub(r"(?<![\d.])\d+\.\d+(?![\d.])", _digits_to_words, text)
+    # 2. Ordinals ending with a dot: 19. -> devatenáctý
+    text = re.sub(r"(?<!\d)(\d+)\.(?!\d)", _ordinal_to_words, text)
+    # 3. Remaining integers
+    text = re.sub(r"(?<!\d)\d+(?!\d)", _cardinal_to_words, text)
+    return text
 
 
 def translation_request(
@@ -54,6 +97,7 @@ def translation_request(
         ) from exc
 
     raw_response = response.choices[0].message.content.strip()
+    raw_response = post_process_numbers(raw_response)
     normalized_response = unicodedata.normalize("NFC", raw_response)
 
     return normalized_response

@@ -103,8 +103,6 @@ def main(
         if content_description is not None
         else app_config.content_description
     )
-    if not content_desc:
-        content_desc = content_desc_default
 
     device = device if device is not None else app_config.transcription.device
     batch_size = (

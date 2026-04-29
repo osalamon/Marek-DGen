@@ -38,7 +38,7 @@ Optional flags (when omitted, values are read from `advanced_conf.json`):
     --translating-model="qwen3.5-122b" \
     --temperature=0.05 \
     --max-tokens=75 \
-    --voices="ctvrtnicek,moravec,steindler,zeman,mucha,holubova,kopecka,vasaryova" \
+    --voices="brother,salamlow,salam" \
     --content-description="A conversation about Rust and AI"
 ```
 

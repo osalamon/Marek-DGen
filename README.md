@@ -42,7 +42,5 @@ Optional flags (when omitted, values are read from `advanced_conf.json`):
     --content-description="A conversation about Rust and AI"
 ```
 
-## Status: work in progress
-
-- TTS is almost finished
-- The last missing piece: assembling audio/video files back via ffmpeg
+## Status: PoC 
+(It works... sometimes somehow. Need voices with much better quality + access to betterr HW.)

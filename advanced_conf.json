@@ -1,0 +1,25 @@
+{
+    "content_description": "conversation in the episode nr. 311 of the Peter Attia's podcast Drive called Longevity 101 where he concisely summarize results of his more than one decade lasting research into human longevity",
+    "translation": {
+        "default_model": "qwen3.5",
+        "default_temperature": 0.05,
+        "default_max_tokens": 75
+    },
+    "tts": {
+        "voices_mapping": {
+            "brother": "voices/brother.wav",
+            "salam": "voices/salam.wav",
+            "salamlow": "voices/salamlow.wav"
+        },
+        "language": "cs",
+        "output_format": "wav"
+    },
+    "output": {
+        "directory": "output",
+        "naming_pattern": "{speaker}_{index}.wav"
+    },
+    "assembly": {
+        "video_suffix": "_CZ",
+        "output_format": "mp4"
+    }
+}

@@ -1,8 +1,10 @@
 import json
+import shutil
 import tempfile
 from pathlib import Path
 
-from marek_dgen.utils.config import AssemblyConfig
+from marek_dgen.subtitles import generate_ass
+from marek_dgen.utils.config import AssemblyConfig, SubtitlesConfig
 from marek_dgen.utils.audio_probe import probe_audio_format
 from marek_dgen.utils.ffmpeg_runner import run_ffmpeg_command
 from marek_dgen.utils.silence_generator import generate_silence
@@ -13,6 +15,7 @@ def assemble_dubbed_video(
     original_video: Path,
     output_dir: Path,
     assembly_config: AssemblyConfig,
+    subtitles_config: SubtitlesConfig | None = None,
 ) -> Path:
     """Assemble a gap-preserving dubbed audio track and mux it into the original video."""
     with open(manifest_path, "r", encoding="utf-8") as f:
@@ -85,21 +88,58 @@ def assemble_dubbed_video(
         final_name = f"{original_video.stem}{suffix}.{out_ext}"
         final_video_path = output_dir / final_name
 
-        mux_cmd = [
-            "ffmpeg",
-            "-y",
-            "-i",
-            str(original_video),
-            "-i",
-            str(dubbed_wav),
-            "-c:v",
-            "copy",
-            "-map",
-            "0:v:0",
-            "-map",
-            "1:a:0",
-            str(final_video_path),
-        ]
+        if subtitles_config and subtitles_config.enabled:
+            # Burning subtitles requires re-encoding the video stream,
+            # so -c:v copy is not possible here.
+            ass_tmp = tmpdir_path / "subs.ass"
+            generate_ass(manifest, subtitles_config, ass_tmp)
+            # Keep a copy of the subtitle file for reference/inspection.
+            shutil.copy(ass_tmp, output_dir / "subtitles.ass")
+            escaped = (
+                str(ass_tmp.resolve())
+                .replace("\\", "/")
+                .replace(":", "\\:")
+                .replace("'", "\\'")
+            )
+            mux_cmd = [
+                "ffmpeg",
+                "-y",
+                "-i",
+                str(original_video),
+                "-i",
+                str(dubbed_wav),
+                "-vf",
+                f"subtitles='{escaped}'",
+                "-map",
+                "0:v:0",
+                "-map",
+                "1:a:0",
+                "-c:v",
+                "libx264",
+                "-crf",
+                "18",
+                "-preset",
+                "medium",
+                "-c:a",
+                "aac",
+                str(final_video_path),
+            ]
+        else:
+            mux_cmd = [
+                "ffmpeg",
+                "-y",
+                "-i",
+                str(original_video),
+                "-i",
+                str(dubbed_wav),
+                "-c:v",
+                "copy",
+                "-map",
+                "0:v:0",
+                "-map",
+                "1:a:0",
+                str(final_video_path),
+            ]
         run_ffmpeg_command(mux_cmd)
 
     return final_video_path

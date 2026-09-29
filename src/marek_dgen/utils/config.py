@@ -33,6 +33,22 @@ class AssemblyConfig(BaseModel):
     output_format: str = "mp4"
 
 
+class SubtitlesConfig(BaseModel):
+    """Settings for burned-in ASS subtitles."""
+
+    enabled: bool = False
+    bilingual: bool = False
+    font_name: str = "Arial"
+    font_size: int = 20
+    secondary_font_size: int = 14
+    # ASS color format: &HAABBGGRR
+    primary_color: str = "&H00FFFFFF"      # white (translated)
+    secondary_color: str = "&H00C0C0C0"    # light gray (original)
+    outline_color: str = "&H00000000"      # black
+    margin_v: int = 30
+    include_skipped: bool = True           # show text for segments without dubbed audio
+
+
 class AppConfig(BaseModel):
     content_description: str = ""
     transcription: TranscriptionConfig = Field(default_factory=TranscriptionConfig)
@@ -40,6 +56,7 @@ class AppConfig(BaseModel):
     tts: TTSConfig
     output: OutputConfig = Field(default_factory=OutputConfig)
     assembly: AssemblyConfig = Field(default_factory=AssemblyConfig)
+    subtitles: SubtitlesConfig = Field(default_factory=SubtitlesConfig)
 
 
 def load_config(path: str | Path) -> AppConfig:

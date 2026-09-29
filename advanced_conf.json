@@ -21,5 +21,14 @@
     "assembly": {
         "video_suffix": "_CZ",
         "output_format": "mp4"
+    },
+    "subtitles": {
+        "enabled": true,
+        "bilingual": true,
+        "font_name": "Arial",
+        "font_size": 20,
+        "secondary_font_size": 14,
+        "margin_v": 30,
+        "include_skipped": true
     }
 }

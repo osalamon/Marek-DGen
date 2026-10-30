@@ -215,6 +215,7 @@ def main(
             eng_text,
         )
 
+        segment["original_text"] = eng_text
         segment["text"] = cz_text
 
     click.echo("\n>>> Final output of Phase 2 (Translation):::")
@@ -303,6 +304,7 @@ def main(
             "end": segment.get("end", 0.0),
             "speaker": speaker,
             "text": text,
+            "original_text": segment.get("original_text"),
         }
 
         if not speaker_wav:
@@ -354,6 +356,7 @@ def main(
         original_video=Path(audio_file),
         output_dir=output_dir,
         assembly_config=app_config.assembly,
+        subtitles_config=app_config.subtitles,
     )
     click.echo(
         f"\n======================================================================================"
